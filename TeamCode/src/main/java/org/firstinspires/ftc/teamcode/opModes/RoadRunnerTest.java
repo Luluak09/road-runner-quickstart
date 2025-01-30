@@ -2,8 +2,11 @@ package org.firstinspires.ftc.teamcode.opModes;
 
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
 
+import static java.lang.Math.PI;
+
 import androidx.annotation.NonNull;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -40,8 +43,10 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
@@ -64,24 +69,93 @@ import java.lang.Math;
 
 @Autonomous
 public class RoadRunnerTest extends LinearOpMode {
+    public class CustomAction implements Action {
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            double gripLiftPower = (targetLift-gripLift.getCurrentPosition())*kp;
+            gripLift.setPower(gripLiftPower);
+
+            return true;
+
+
+        }
+    }
+    public class TargetAction implements Action {
+        public int inputTarget;
+        public TargetAction(int target) {
+            inputTarget = target;
+        }
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            targetLift = inputTarget;
+            return false;
+
+
+        }
+    }
+
+    public class ServoAction implements Action {
+        public double inputTarget;
+        public Servo inputservo;
+        public ServoAction(double target, Servo servo) {
+            inputTarget = target;
+            inputservo = servo;
+        }
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            inputservo.setPosition(inputTarget);
+            return false;
+
+
+        }
+    }
+    DcMotor gripLift;
+    Servo claw;
+    int targetLift = 0;
+    double kp = 0.01;
     @Override
     public void runOpMode() {
+
+        gripLift = hardwareMap.get(DcMotor.class, "gripLift");
         Pose2d startPose = new Pose2d(0,0,0);
         MecanumDrive drive = new MecanumDrive(hardwareMap,startPose);
 
+        gripLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        gripLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        gripLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        Telemetry tele = FtcDashboard.getInstance().getTelemetry();
+        gripLift.setDirection(DcMotorSimple.Direction.REVERSE);
+
         Pose2d myPose = new Pose2d(10, -5, Math.toRadians(90));
+claw = hardwareMap.get(Servo.class,"clawServo");
 
 
-        Action myTrajectory = drive.actionBuilder(startPose)
-                .lineToX(10)
-                .lineToY(5)
-                .build();
+        TrajectoryActionBuilder t1 = drive.actionBuilder(new Pose2d(0,0,0))
+                        .setTangent(0)
 
+                                .splineToConstantHeading(new Vector2d(32,4),PI);
+        Action forward = t1.build();
+claw.setPosition(0.2);
         waitForStart();
         if (isStopRequested()) return;
 
-        Actions.runBlocking(myTrajectory);
+        Actions.runBlocking(
+                new ParallelAction(
+                new CustomAction(),
 
-    }
-}
+                        new SequentialAction(
+                                new ServoAction(0.2,claw),
+                                new TargetAction(2000), forward,
+                                new TargetAction(1500),new SleepAction(3),
+                                new ServoAction(0.5, claw)
+                        )
+                )
+        );
+
+
+
+
+
+            }
+        }
 
