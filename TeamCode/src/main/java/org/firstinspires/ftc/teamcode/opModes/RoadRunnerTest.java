@@ -23,6 +23,7 @@ import com.acmerobotics.roadrunner.TimeTurn;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.TurnConstraints;
 import com.acmerobotics.roadrunner.VelConstraint;
+import com.acmerobotics.roadrunner.ftc.Actions;
 import com.acmerobotics.roadrunner.ftc.DownsampledWriter;
 import com.acmerobotics.roadrunner.ftc.Encoder;
 import com.acmerobotics.roadrunner.ftc.FlightRecorder;
@@ -33,6 +34,7 @@ import com.acmerobotics.roadrunner.ftc.PositionVelocityPair;
 import com.acmerobotics.roadrunner.ftc.RawEncoder;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -60,37 +62,25 @@ import com.acmerobotics.roadrunner.*;
 
 import java.lang.Math;
 
-
+@Autonomous
 public class RoadRunnerTest extends LinearOpMode {
-    @Override 
+    @Override
     public void runOpMode() {
-        MecanumDrive drive = new MecanumDrive(hardwareMap);
+        Pose2d startPose = new Pose2d(0,0,0);
+        MecanumDrive drive = new MecanumDrive(hardwareMap,startPose);
 
         Pose2d myPose = new Pose2d(10, -5, Math.toRadians(90));
-        
-        drive.setPoseEstimate(myPose);
 
 
-Canvas traj1 = drive.trajectoryBuilder(startPose)
-        .splineTo(new vector2d(40, 40), Math.toRadians(45))
-        .build();
-
-        Canvas traj2 = drive.trajectoryBuilder(startPose)
-                .splineTo(new vector(40, 40), Math.toRadians(45))
+        Action myTrajectory = drive.actionBuilder(startPose)
+                .lineToX(10)
+                .lineToY(5)
                 .build();
 
-        drive.drawPoseHistory(traj1);
-        drive.drawPoseHistory(traj2);
-        
         waitForStart();
+        if (isStopRequested()) return;
 
-        if(isStopRequested()) return;
-
-        Canvas myTrajectory = new Canvas();
-        drive.drawPoseHistory(myTrajectory);
-        
-        
-            Vector = new Vector2d(10, -5);
+        Actions.runBlocking(myTrajectory);
 
     }
 }
