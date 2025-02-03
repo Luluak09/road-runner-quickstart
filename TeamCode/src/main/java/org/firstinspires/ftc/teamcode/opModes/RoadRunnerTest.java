@@ -136,16 +136,13 @@ claw = hardwareMap.get(Servo.class,"clawServo");
                                 .splineToConstantHeading(new Vector2d(32,4),PI);
         Action forward = t1.build();
 
-        TrajectoryActionBuilder t2 = drive.actionBuilder(new Pose2d(32,4,0))
-                        .setTangent(0)
+        TrajectoryActionBuilder t2 = drive.actionBuilder(new Pose2d(32,4,PI))
+                        .setTangent(PI/2)
 
-                .splineToConstantHeading(new Vector2d(-21,-37),PI/2);
+                .splineToConstantHeading(new Vector2d(-13,-30),PI/2);
         Action backwards = t2.build();
 
-       // TrajectoryActionBuilder t3 = drive.actionBuilder(new Pose2d(-21,-37,))
-                  //      .setTangent(0)
 
-                          //      .splineToConstantHeading(new Vector2d())
 
 
 
