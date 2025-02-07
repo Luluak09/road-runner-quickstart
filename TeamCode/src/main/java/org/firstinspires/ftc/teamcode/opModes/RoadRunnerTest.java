@@ -139,8 +139,14 @@ claw = hardwareMap.get(Servo.class,"clawServo");
         TrajectoryActionBuilder t2 = drive.actionBuilder(new Pose2d(32,4,PI))
                         .setTangent(PI/2)
 
-                .splineToConstantHeading(new Vector2d(-13,-30),PI/2);
+                .splineToConstantHeading(new Vector2d(2,0),PI/2);
         Action backwards = t2.build();
+
+        TrajectoryActionBuilder t3 = drive.actionBuilder(new Pose2d(2,0,PI/2))
+                        .setTangent(0)
+
+                .splineToConstantHeading(new Vector2d(0,-35),0);
+        Action sideways = t3.build();
 
 
 
@@ -161,7 +167,9 @@ claw = hardwareMap.get(Servo.class,"clawServo");
                                 new ServoAction(0.2,claw),
                                 new TargetAction(2000), forward,
                                 new TargetAction(1500),
-                                new ServoAction(0.75, claw),backwards
+                                new ServoAction(0.75, claw),new SleepAction(2),backwards,
+                                sideways
+
                         )
                 )
         );
