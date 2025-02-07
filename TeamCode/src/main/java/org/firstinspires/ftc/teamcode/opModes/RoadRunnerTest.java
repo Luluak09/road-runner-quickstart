@@ -1,14 +1,13 @@
 package org.firstinspires.ftc.teamcode.opModes;
 
-import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
+
 
 import static java.lang.Math.PI;
 
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.canvas.Canvas;
-import com.acmerobotics.dashboard.config.Config;
+
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.*;
 import com.acmerobotics.roadrunner.AngularVelConstraint;
@@ -136,12 +135,22 @@ claw = hardwareMap.get(Servo.class,"clawServo");
                                 .splineToConstantHeading(new Vector2d(32,4),PI);
         Action forward = t1.build();
 
+
         TrajectoryActionBuilder t2 = drive.actionBuilder(new Pose2d(32,4,PI/2))
                 .setTangent(PI/2)
 
                 .splineToConstantHeading(new Vector2d(-13,-22),PI/2);
         Action backwards = t2.build();
 claw.setPosition(0.2);
+
+
+
+
+
+
+
+
+        claw.setPosition(0.2);
         waitForStart();
         if (isStopRequested()) return;
 
@@ -154,9 +163,13 @@ claw.setPosition(0.2);
                                 new TargetAction(2000), forward,
                                 new TargetAction(1500),new SleepAction(3),
                                 new ServoAction(0.5, claw),backwards
+
+
                         )
                 )
         );
+
+
 
 
 
