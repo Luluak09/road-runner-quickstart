@@ -135,6 +135,12 @@ claw = hardwareMap.get(Servo.class,"clawServo");
 
                                 .splineToConstantHeading(new Vector2d(32,4),PI);
         Action forward = t1.build();
+
+        TrajectoryActionBuilder t2 = drive.actionBuilder(new Pose2d(32,4,PI/2))
+                .setTangent(PI/2)
+
+                .splineToConstantHeading(new Vector2d(-13,-22),PI/2);
+        Action backwards = t2.build();
 claw.setPosition(0.2);
         waitForStart();
         if (isStopRequested()) return;
@@ -147,7 +153,7 @@ claw.setPosition(0.2);
                                 new ServoAction(0.2,claw),
                                 new TargetAction(2000), forward,
                                 new TargetAction(1500),new SleepAction(3),
-                                new ServoAction(0.5, claw)
+                                new ServoAction(0.5, claw),backwards
                         )
                 )
         );
