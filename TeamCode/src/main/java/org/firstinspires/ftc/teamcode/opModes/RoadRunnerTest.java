@@ -170,7 +170,7 @@ claw.setPosition(0.2);
                                 new ServoAction(0.2,claw),
                                 new TargetAction(2000), forward,
                                 new TargetAction(1500),
-                                new ServoAction(0.75, claw),new SleepAction(2),backwards,
+                                new ServoAction(0.75, claw),new SleepAction(1),backwards,
                                 sideways
 
                         )
